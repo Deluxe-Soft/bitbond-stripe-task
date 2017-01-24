@@ -28,8 +28,8 @@ class User < ActiveRecord::Base
   end
 
   def get_current_balance
-    KEY_ID = self.stripe_user_id.to_s
-    Stripe::Balance.retrieve(stripe_account: KEY_ID)
+    key_id = self.stripe_user_id.to_s
+    Stripe::Balance.retrieve(stripe_account: key_id)
   end
 
   def self.get_all_sources_from_customer(customer)
