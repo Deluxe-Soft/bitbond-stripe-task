@@ -46,27 +46,11 @@ class UsersController < ApplicationController
 
     @listed_values = User::stats_object_from_date(starting_date)
 
-    calculate_montly_stats
-    calculate_averages
+    @charges_stats = @user.calculate_montly_stats
+    @last_year_stats = User::calculate_averages(@charges_stats)
 
-    @chart_year = {}
-    initialize_charts_for_year(2016)
-    initialize_charts_for_year(2017)
+    initialize_chart_view
 
-    gon.chart_year = @chart_year
-
-  end
-
-  def initialize_charts_for_year(year)
-    @chart_year[year] = []
-
-    1.upto(12).each do |month|
-      unless @charges_stats[year][month]
-        @chart_year[year].push 0
-      else
-        @chart_year[year].push @charges_stats[year][month].map { |x| x[0] }.sum
-      end
-    end
   end
 
   # 3. Process the data
@@ -163,48 +147,24 @@ class UsersController < ApplicationController
   end
 
 
-  def calculate_averages
-    @previous_year = (DateTime.now - 1.year).year
 
-    previous_values = @charges_stats[@previous_year].values
-    current_values = @charges_stats[@previous_year + 1].values
-
-    prev_income = previous_values.map { |x| [x.map { |x| x[0] }] }.flatten.sum
-    curr_income = current_values.map { |x| [x.map { |x| x[0] }] }.flatten.sum
-
-    yoy_value = (prev_income > curr_income) ? (prev_income/(curr_income-1)).abs : (curr_income/(prev_income-1)).abs
-
-    @last_year_stats = {
-        avg_charges: (previous_values.map { |x| x.count }.sum / 12),
-        avg_income: (prev_income / 12),
-        avg_outcome: (previous_values.map { |x| [x.map { |x| x[1] }] }.flatten.sum / 12),
-        yoy_value: yoy_value
-    }
+  def initialize_chart_view
+    @chart_year = {}
+    initialize_charts_for_year(2016)
+    initialize_charts_for_year(2017)
+    gon.chart_year = @chart_year
   end
 
-  def calculate_montly_stats
+  def initialize_charts_for_year(year)
+    @chart_year[year] = []
 
-    stats_agg = {}
-
-    Stripe::Charge.all.map do |c|
-      c_year = Time.at(c.created).year
-      c_month = Time.at(c.created).month
-
-      if stats_agg[c_year]
-        if stats_agg[c_year][c_month]
-        else
-          stats_agg[c_year][c_month] = []
-        end
+    1.upto(12).each do |month|
+      unless @charges_stats[year][month]
+        @chart_year[year].push 0
       else
-        stats_agg[c_year] = {}
-        stats_agg[c_year][c_month] = []
+        @chart_year[year].push @charges_stats[year][month].map { |x| x[0] }.sum
       end
-
-      stats_agg[c_year][c_month].push [c.amount, c.amount_refunded]
-
     end
-
-    @charges_stats = stats_agg
   end
 
 

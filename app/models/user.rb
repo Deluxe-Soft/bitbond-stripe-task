@@ -48,4 +48,49 @@ class User < ActiveRecord::Base
         subscriptions:    Stripe::Subscription.list(created: {gte: starting_date})
     }
   end
+
+
+  def calculate_montly_stats
+    stats_agg = {}
+
+    Stripe::Charge.all.map do |c|
+      c_year = Time.at(c.created).year
+      c_month = Time.at(c.created).month
+
+      if stats_agg[c_year]
+        if stats_agg[c_year][c_month]
+        else
+          stats_agg[c_year][c_month] = []
+        end
+      else
+        stats_agg[c_year] = {}
+        stats_agg[c_year][c_month] = []
+      end
+
+      stats_agg[c_year][c_month].push [c.amount, c.amount_refunded]
+
+    end
+
+    return stats_agg
+  end
+
+
+  def self.calculate_averages(charges)
+    previous_year = (DateTime.now - 1.year).year
+
+    previous_values = charges[previous_year].values
+    current_values = charges[previous_year + 1].values
+
+    prev_income = previous_values.map { |x| [x.map { |x| x[0] }] }.flatten.sum
+    curr_income = current_values.map { |x| [x.map { |x| x[0] }] }.flatten.sum
+
+    yoy_value = (prev_income > curr_income) ? (prev_income/(curr_income-1)).abs : (curr_income/(prev_income-1)).abs
+
+    return {
+        avg_charges: (previous_values.map { |x| x.count }.sum / 12),
+        avg_income: (prev_income / 12),
+        avg_outcome: (previous_values.map { |x| [x.map { |x| x[1] }] }.flatten.sum / 12),
+        yoy_value: yoy_value
+    }
+  end
 end
