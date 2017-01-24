@@ -25,6 +25,8 @@
     - else
       = render partial: 'pay'
     = render partial: 'listed_values', locals: {starting_date: (DateTime.now - 3.year).to_time.to_i}
+    = render partial: 'stats'
+
 
   - else
     - if is_myself? && !current_user.connected?

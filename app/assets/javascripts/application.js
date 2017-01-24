@@ -6,3 +6,7 @@
 //= require app/connect
 //= require app/pay
 //= require app/subscribe
+
+
+//= require app/chartis
+//= require app/chart

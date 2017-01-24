@@ -1,0 +1,10 @@
+%hr
+= "Stats for previous year: #{@previous_year}"
+%br
+= "Average nof charges per month: #{@last_year_stats[:avg_charges]}"
+%br
+= "Average Income per month: #{@last_year_stats[:avg_income]}"
+%br
+= "Average Outcome per month: #{@last_year_stats[:avg_outcome]}"
+%br
+= "YOY value: #{number_to_percentage @last_year_stats[:yoy_value]}"

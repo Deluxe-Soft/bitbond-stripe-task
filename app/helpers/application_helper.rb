@@ -16,4 +16,12 @@ module ApplicationHelper
   def self.pretty_balance
     balance_object.available.map{|o| "#{o.amount} #{o.currency}"}.join(',')
   end
+
+  def format_json(obj)
+    "<strong>#{obj.count} of elements</strong><br /><br />".html_safe + " =>#{obj.inspect}" #TODO: IMPLEMENT ME :)
+  end
+
+  def pretty_month(num)
+    Date::MONTHNAMES[num]
+  end
 end

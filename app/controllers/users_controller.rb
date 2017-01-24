@@ -41,9 +41,38 @@ class UsersController < ApplicationController
     @user = User.find( params[:id] )
     @user_balance = Stripe::Balance.retrieve(stripe_account: @user.stripe_user_id.to_s)
     @plans = Stripe::Plan.all
+
+
+    calculate_montly_stats
+    calculate_averages
+
+    @chart_year = {}
+    initialize_charts_for_year(2016)
+    initialize_charts_for_year(2017)
+
+    gon.chart_year = @chart_year
+
   end
 
-  # Make a one-off payment to the user.
+  def initialize_charts_for_year(year)
+    @chart_year[year] = []
+
+    1.upto(12).each do |month|
+      unless @charges_stats[year][month]
+        @chart_year[year].push 0
+      else
+        @chart_year[year].push @charges_stats[year][month].map { |x| x[0] }.sum
+      end
+    end
+  end
+
+  # 3. Process the data
+ # – for each month: [number of charges, total incoming amount, total outgoing amount, year over year change]
+ # – last year avarage per month: [number of charges, total incoming amount, total outgoing amount, volatility]
+ #4. Display data for an easy analysis.
+
+
+      # Make a one-off payment to the user.
   # See app/assets/javascripts/app/pay.coffee
   def pay
     # Find the user to pay.
@@ -129,5 +158,51 @@ class UsersController < ApplicationController
     p[:email].downcase!
     p
   end
+
+
+  def calculate_averages
+    @previous_year = (DateTime.now - 1.year).year
+
+    previous_values = @charges_stats[@previous_year].values
+    current_values = @charges_stats[@previous_year + 1].values
+
+    prev_income = previous_values.map { |x| [x.map { |x| x[0] }] }.flatten.sum
+    curr_income = current_values.map { |x| [x.map { |x| x[0] }] }.flatten.sum
+
+    yoy_value = (prev_income > curr_income) ? (prev_income/(curr_income-1)).abs : (curr_income/(prev_income-1)).abs
+
+    @last_year_stats = {
+        avg_charges: (previous_values.map { |x| x.count }.sum / 12),
+        avg_income: (prev_income / 12),
+        avg_outcome: (previous_values.map { |x| [x.map { |x| x[1] }] }.flatten.sum / 12),
+        yoy_value: yoy_value
+    }
+  end
+
+  def calculate_montly_stats
+
+    stats_agg = {}
+
+    Stripe::Charge.all.map do |c|
+      c_year = Time.at(c.created).year
+      c_month = Time.at(c.created).month
+
+      if stats_agg[c_year]
+        if stats_agg[c_year][c_month]
+        else
+          stats_agg[c_year][c_month] = []
+        end
+      else
+        stats_agg[c_year] = {}
+        stats_agg[c_year][c_month] = []
+      end
+
+      stats_agg[c_year][c_month].push [c.amount, c.amount_refunded]
+
+    end
+
+    @charges_stats = stats_agg
+  end
+
 
 end

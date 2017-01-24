@@ -1,0 +1,22 @@
+%hr
+- @charges_stats.keys.sort.each do |year|
+  %p
+    %strong
+      = "Stats for year #{year}"
+  %p
+    - @charges_stats[year].keys.sort.each do |month|
+      %div
+        %strong
+          = "Month: #{pretty_month(month)}"
+      %p
+        = "Total charges: #{@charges_stats[year][month].count}"
+        %br
+        = "Incoming: #{@charges_stats[year][month].map{|x| x[0]}.sum}"
+        %br
+        = "Outcoming: #{@charges_stats[year][month].map{|x| x[1]}.sum}"
+        %br
+  %hr
+
+
+Total Incomes from current and last year:
+#my-chart
