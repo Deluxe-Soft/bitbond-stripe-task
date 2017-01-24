@@ -24,7 +24,7 @@
       = render partial: 'account_details'
     - else
       = render partial: 'pay'
-    = render partial: 'listed_values', locals: {starting_date: (DateTime.now - 3.year).to_time.to_i}
+    = render partial: 'listed_values', locals: {listed_values: @listed_values}
     = render partial: 'stats'
 
 

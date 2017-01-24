@@ -6,28 +6,28 @@
       %a{:"data-toggle" => "collapse", :"data-target" => "#charges"}
         List of all charges
       %p{:id => "charges", "class" => "collapse"}
-        = format_json Stripe::Charge.list(created: {gte: starting_date})
+        = format_json listed_values[:charges]
     %p
       %a{:"data-toggle" => "collapse", :"data-target" => "#refunds"}
         List of all refunds
       %p{:id => "refunds", "class" => "collapse"}
-        = format_json Stripe::Refund.list(created: {gte: starting_date})
+        = format_json listed_values[:refunds]
     %p
       %a{:"data-toggle" => "collapse", :"data-target" => "#disputes"}
         List of all disputes
       %p{:id => "disputes", "class" => "collapse"}
-        = format_json Stripe::Dispute.list(created: {gte: starting_date})
+        = format_json listed_values[:disputes]
     %p
       %a{:"data-toggle" => "collapse", :"data-target" => "#transfers"}
         List of all transfers
       %p{:id => "transfers", "class" => "collapse"}
-        = format_json Stripe::Transfer.list(created: {gte: starting_date})
+        = format_json listed_values[:transfers]
 
     %p
       %a{:"data-toggle" => "collapse", :"data-target" => "#all_cards"}
         List of all cards
       %p{:id => "all_cards", "class" => "collapse"}
-        = format_json Stripe::Customer.list.each do |customer|
+        = format_json listed_values[:customers].each do |customer|
           %span
             = "All cards for: #{customer.description}"
           %span
@@ -37,16 +37,16 @@
       %a{:"data-toggle" => "collapse", :"data-target" => "#orders"}
         List of all orders
       %p{:id => "orders", "class" => "collapse"}
-        = format_json Stripe::Order.list(created: {gte: starting_date})
+        = format_json listed_values[:orders]
 
     %p
       %a{:"data-toggle" => "collapse", :"data-target" => "#returns"}
         List of all returns
       %p{:id => "returns", "class" => "collapse"}
-        = format_json Stripe::OrderReturn.list(created: {gte: starting_date})
+        = format_json listed_values[:returns]
 
     %p
       %a{:"data-toggle" => "collapse", :"data-target" => "#subscriptions"}
         List of all subscriptions
       %p{:id => "subscriptions", "class" => "collapse"}
-        = format_json Stripe::Subscription.list(created: {gte: starting_date})
+        = format_json listed_values[:subscriptions]
