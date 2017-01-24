@@ -1,0 +1,54 @@
+.panel.panel-primary
+  .panel-body
+    %h3 List of values specified by second point of task:
+
+    %p
+      %a{:"data-toggle" => "collapse", :"data-target" => "#charges"}
+        List of all charges
+      %p{:id => "charges", "class" => "collapse"}
+        = Stripe::Charge.list(created: {gte: starting_date}).inspect
+    %p
+      %a{:"data-toggle" => "collapse", :"data-target" => "#refunds"}
+        List of all refunds
+      %p{:id => "refunds", "class" => "collapse"}
+        = Stripe::Refund.list(created: {gte: starting_date}).inspect
+
+    %p
+      %a{:"data-toggle" => "collapse", :"data-target" => "#disputes"}
+        List of all disputes
+      %p{:id => "disputes", "class" => "collapse"}
+        = Stripe::Dispute.list(created: {gte: starting_date}).inspect
+
+    %p
+      %a{:"data-toggle" => "collapse", :"data-target" => "#transfers"}
+        List of all transfers
+      %p{:id => "transfers", "class" => "collapse"}
+        = Stripe::Transfer.list(created: {gte: starting_date}).inspect
+
+    %p
+      %a{:"data-toggle" => "collapse", :"data-target" => "#all_cards"}
+        List of all cards
+      %p{:id => "all_cards", "class" => "collapse"}
+        = Stripe::Customer.list.each do |customer|
+          %span
+            = "All cards for: #{customer.description}"
+          %span
+            = Stripe::Customer.retrieve(customer.id).sources.all(:object => "bank_account")
+
+    %p
+      %a{:"data-toggle" => "collapse", :"data-target" => "#orders"}
+        List of all orders
+      %p{:id => "orders", "class" => "collapse"}
+        = Stripe::Order.list(created: {gte: starting_date}).inspect
+
+    %p
+      %a{:"data-toggle" => "collapse", :"data-target" => "#returns"}
+        List of all returns
+      %p{:id => "returns", "class" => "collapse"}
+        = Stripe::OrderReturn.list(created: {gte: starting_date}).inspect
+
+    %p
+      %a{:"data-toggle" => "collapse", :"data-target" => "#subscriptions"}
+        List of all subscriptions
+      %p{:id => "subscriptions", "class" => "collapse"}
+        = Stripe::Subscription.list(created: {gte: starting_date}).inspect

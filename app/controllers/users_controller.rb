@@ -39,6 +39,7 @@ class UsersController < ApplicationController
   # app/views/users/show.html.haml
   def show
     @user = User.find( params[:id] )
+    @user_balance = Stripe::Balance.retrieve(stripe_account: @user.stripe_user_id.to_s)
     @plans = Stripe::Plan.all
   end
 

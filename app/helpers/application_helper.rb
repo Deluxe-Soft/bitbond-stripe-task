@@ -12,4 +12,8 @@ module ApplicationHelper
   def is_myself?
     @user == current_user
   end
+
+  def self.pretty_balance
+    balance_object.available.map{|o| "#{o.amount} #{o.currency}"}.join(',')
+  end
 end

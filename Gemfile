@@ -4,7 +4,7 @@ gem 'rails', '4.2'
 gem 'pg'
 gem 'thin'
 
-gem 'stripe'
+gem 'stripe', '1.58'
 gem 'oauth2'
 
 gem 'haml'

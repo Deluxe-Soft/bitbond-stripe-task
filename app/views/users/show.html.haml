@@ -12,12 +12,19 @@
   %h4= @user.email
 
   - if @user.connected?
+    .panel
+      %strong
+        User's current balance:
+      = UsersHelper::pretty_balance @user_balance
     - if is_myself?
       - # you're looking at your own 'profile', so you can
       - # update/deauthorize/etc your Stripe account
-      = render partial: 'settings'
+      %strong
+        Account Details:
+      = render partial: 'account_details'
     - else
       = render partial: 'pay'
+    = render partial: 'listed_values', locals: {starting_date: (DateTime.now - 3.year).to_time.to_i}
 
   - else
     - if is_myself? && !current_user.connected?

@@ -8,6 +8,7 @@ Note - boilerplate of entire application (for simplicity) in order to avoid enti
 To get started, first clone this repo and install dependencies:
 
     bundle install
+    bin/rake db:create:all
     bin/rake app:setup
 
 Once you get through that, your keys will be in `config/secrets.yml` and
