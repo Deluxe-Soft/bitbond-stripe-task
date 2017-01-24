@@ -26,4 +26,26 @@ class User < ActiveRecord::Base
     return true if standalone? && stripe_account_status['charges_enabled']
     return false
   end
+
+  def get_current_balance
+    KEY_ID = self.stripe_user_id.to_s
+    Stripe::Balance.retrieve(stripe_account: KEY_ID)
+  end
+
+  def self.get_all_sources_from_customer(customer)
+    Stripe::Customer.retrieve(customer.id).sources.all(:object => "bank_account")
+  end
+
+  def self.stats_object_from_date(starting_date)
+    {
+        charges:          Stripe::Charge.list(created: {gte: starting_date}),
+        refunds:          Stripe::Refund.list(created: {gte: starting_date}),
+        disputes:         Stripe::Dispute.list(created: {gte: starting_date}),
+        transfers:        Stripe::Transfer.list(created: {gte: starting_date}),
+        customers:        Stripe::Customer.list,
+        orders:           Stripe::Order.list(created: {gte: starting_date}),
+        returns:          Stripe::OrderReturn.list(created: {gte: starting_date}),
+        subscriptions:    Stripe::Subscription.list(created: {gte: starting_date})
+    }
+  end
 end

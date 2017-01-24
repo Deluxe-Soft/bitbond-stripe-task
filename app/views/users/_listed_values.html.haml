@@ -31,7 +31,7 @@
           %span
             = "All cards for: #{customer.description}"
           %span
-            = format_json Stripe::Customer.retrieve(customer.id).sources.all(:object => "bank_account")
+            = format_json User::get_all_sources_from_customer(customer)
 
     %p
       %a{:"data-toggle" => "collapse", :"data-target" => "#orders"}

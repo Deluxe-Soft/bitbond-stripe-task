@@ -39,21 +39,12 @@ class UsersController < ApplicationController
   # app/views/users/show.html.haml
   def show
     @user = User.find( params[:id] )
-    @user_balance = Stripe::Balance.retrieve(stripe_account: @user.stripe_user_id.to_s)
+    @user_balance = @user.get_current_balance
     @plans = Stripe::Plan.all
 
     starting_date = (DateTime.now - 3.year).to_time.to_i
 
-    @listed_values = {
-        charges:          Stripe::Charge.list(created: {gte: starting_date}),
-        refunds:          Stripe::Refund.list(created: {gte: starting_date}),
-        disputes:         Stripe::Dispute.list(created: {gte: starting_date}),
-        transfers:        Stripe::Transfer.list(created: {gte: starting_date}),
-        customers:        Stripe::Customer.list,
-        orders:           Stripe::Order.list(created: {gte: starting_date}),
-        returns:          Stripe::OrderReturn.list(created: {gte: starting_date}),
-        subscriptions:    Stripe::Subscription.list(created: {gte: starting_date})
-    }
+    @listed_values = User::stats_object_from_date(starting_date)
 
     calculate_montly_stats
     calculate_averages
